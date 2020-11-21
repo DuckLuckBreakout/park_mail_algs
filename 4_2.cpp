@@ -163,7 +163,7 @@ public:
     ~Heap() = default;
 
     void insert(Type elem);
-    Type &extractPeak(Comp cmp);
+    Type &extractPeak();
     Type const &peekPeak() const;
 
     Heap<Type, Comp>& operator=(const Heap<Type, Comp> &heap);
@@ -171,19 +171,20 @@ public:
     int size() const;
 
 private:
-    void buildHeap(Comp cmp=cmpDefault<Type>());
-    void siftDown(int i, Comp cmp=cmpDefault<Type>());
-    void siftUp(int i, Comp cmp=cmpDefault<Type>());
+    void buildHeap();
+    void siftDown(int i);
+    void siftUp(int i);
 
 private:
     CArray<Type> array;
+    cmpDefault<Type> cmp;
 };
 
 template<typename Type, typename Comp>
-Heap<Type, Comp>::Heap() : array() {}
+Heap<Type, Comp>::Heap() : array(), cmp() {}
 
 template<typename Type, typename Comp>
-Heap<Type, Comp>::Heap(const CArray<Type> &arr) : array(arr) {
+Heap<Type, Comp>::Heap(const CArray<Type> &arr) : array(arr), cmp() {
     buildHeap();
 }
 
@@ -197,7 +198,7 @@ int Heap<Type, Comp>::size() const {
 }
 
 template<typename Type, typename Comp>
-void Heap<Type, Comp>::siftDown(int i, Comp cmp) {
+void Heap<Type, Comp>::siftDown(int i) {
     int left = 2 * i + 1;
     int right = 2 * i + 2;
 
@@ -209,18 +210,18 @@ void Heap<Type, Comp>::siftDown(int i, Comp cmp) {
 
     if (largest != i) {
         std::swap(array[i], array[largest]);
-        siftDown(largest, cmp);
+        siftDown(largest);
     }
 }
 
 template<typename Type, typename Comp>
-void Heap<Type, Comp>::buildHeap(Comp cmp) {
+void Heap<Type, Comp>::buildHeap() {
     for (int i = array.size() / 2 - 1; i >=0; --i)
-        siftDown(i, cmp);
+        siftDown(i);
 }
 
 template<typename Type, typename Comp>
-void Heap<Type, Comp>::siftUp(int index, Comp cmp) {
+void Heap<Type, Comp>::siftUp(int index) {
     while(index > 0) {
         int parent = (index - 1) / 2;
         if(cmp(array[parent], array[index]))
@@ -237,7 +238,7 @@ void Heap<Type, Comp>::insert(Type element) {
 }
 
 template<typename Type, typename Comp>
-Type &Heap<Type, Comp>::extractPeak(Comp cmp) {
+Type &Heap<Type, Comp>::extractPeak() {
     assert(array.size());
     Type result = array[0];
     array[0] = array[array.size() - 1];
@@ -260,12 +261,12 @@ Type const &Heap<Type, Comp>::peekPeak() const {
 }
 
 
-template <typename Type, typename Comp=cmpDefault<Type>>
-int findMinTime(Heap<Type> &heap, Comp cmp=cmpDefault<Type>()) {
+template <typename Type>
+int findMinTime(Heap<Type> &heap) {
     int result = 0;
     while (heap.size() != 1) {
-        int first_min = heap.extractPeak(cmp);
-        int second_min = heap.extractPeak(cmp);
+        int first_min = heap.extractPeak();
+        int second_min = heap.extractPeak();
         int sum = first_min + second_min;
         result += sum;
         heap.insert(sum);
@@ -294,8 +295,7 @@ int main() {
 
     Heap<int> heap = Heap<int>(Arr);
 
-    std::cout << findMinTime(heap, cmpDefault<int>());
+    std::cout << findMinTime(heap);
     return 0;
 }
-
 
