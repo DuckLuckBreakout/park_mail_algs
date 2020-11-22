@@ -177,7 +177,7 @@ private:
 
 private:
     CArray<Type> array;
-    cmpDefault<Type> cmp;
+    Comp cmp;
 };
 
 template<typename Type, typename Comp>
@@ -298,4 +298,3 @@ int main() {
     std::cout << findMinTime(heap);
     return 0;
 }
-
